@@ -18,8 +18,8 @@ package_iOS() {
     
     mkdir -p Payload
     cp -R "${BIN_PKG_PATH}" "Payload/${APPNAME}.app"
-    echo "[*] Removing Non-Swiftfin Dynamic Libraries:"
-    find "Payload/${APPNAME}.app/Frameworks" -depth 1 -type f \( \! -name 'Swiftfin*' \) -exec echo "Removing: {}" \; -exec rm {} \;
+    # echo "[*] Removing Non-Swiftfin Dynamic Libraries:"
+    # find "Payload/${APPNAME}.app/Frameworks" -depth 1 -type f \( \! -name 'Swiftfin*' \) -exec echo "Removing: {}" \; -exec rm {} \;
     zip -9 -r "${PACKAGE_NAME}.ipa" Payload
     rm -rf Payload
     
