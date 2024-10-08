@@ -10,7 +10,7 @@ jobs:
     if: github.event.pull_request.draft == false
     strategy:
       matrix:
-        platform: ['iOS', 'tvOS']
+        platform: ['iOS', 'tvOS', 'macOS']
 
     runs-on: macos-14
 
@@ -44,8 +44,18 @@ jobs:
       - name: Update Carthage
         run: carthage update --use-xcframeworks --cache-builds
 
+      - name: Verify Xcode and SDK versions
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+
       - name: Build ${{ matrix.platform }}
-        run: xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination generic/platform=${{ matrix.platform }} archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        run: |
+          if [ "${{ matrix.platform }}" == "macOS" ]; then
+            xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination generic/platform=iOS archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          else
+            xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination generic/platform=${{ matrix.platform }} archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          fi
 
       - name: Package ${{ matrix.platform }}
         run: ./Misc/scripts/package.sh "build/Swiftfin.${{ matrix.platform }}.xcarchive" ${{ matrix.platform }} "Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}"
