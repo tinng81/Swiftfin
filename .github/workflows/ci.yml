@@ -51,7 +51,7 @@ jobs:
         run: ./Misc/scripts/package.sh "build/Swiftfin.${{ matrix.platform }}.xcarchive" ${{ matrix.platform }} "Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}"
 
       - name: Upload ${{ matrix.platform }} Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}
           path: build/*
