@@ -10,7 +10,7 @@ jobs:
     if: github.event.pull_request.draft == false
     strategy:
       matrix:
-        platform: ['iOS', 'tvOS', 'macOS']
+        platform: ['iOS', 'tvOS', 'iPadOS']
 
     runs-on: macos-14
 
@@ -52,13 +52,20 @@ jobs:
       - name: Build ${{ matrix.platform }}
         run: |
           if [ "${{ matrix.platform }}" == "macOS" ]; then
-            xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination generic/platform=iOS archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination "platform=macOS,arch=arm64" -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          elif [ "${{ matrix.platform }}" == "iPadOS" ]; then
+            xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination 'platform=iOS Simulator,name=iPad Pro (11-inch) (4th generation),OS=latest' archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
           else
             xcodebuild -project "Swiftfin.xcodeproj" -scheme Swiftfin-${{ matrix.platform }} -clonedSourcePackagesDirPath PackageCache -configuration Release -destination generic/platform=${{ matrix.platform }} archive -archivePath "build/Swiftfin.${{ matrix.platform }}.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
           fi
 
       - name: Package ${{ matrix.platform }}
-        run: ./Misc/scripts/package.sh "build/Swiftfin.${{ matrix.platform }}.xcarchive" ${{ matrix.platform }} "Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}"
+        run: |
+          if [ "${{ matrix.platform }}" == "iPadOS" ]; then
+            ./Misc/scripts/package.sh "build/Swiftfin.${{ matrix.platform }}.xcarchive" "macOS" "Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}"
+          else
+            ./Misc/scripts/package.sh "build/Swiftfin.${{ matrix.platform }}.xcarchive" ${{ matrix.platform }} "Swiftfin.${{ steps.commitinfo.outputs.sha_short }}.${{ matrix.platform }}"
+          fi
 
       - name: Upload ${{ matrix.platform }} Artifacts
         uses: actions/upload-artifact@v4
