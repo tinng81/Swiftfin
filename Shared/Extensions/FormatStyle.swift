@@ -3,10 +3,12 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
+
+// TODO: break into separate files
 
 struct HourMinuteFormatStyle: FormatStyle {
 
@@ -75,6 +77,29 @@ extension ParseableFormatStyle where Self == DayIntervalParseableFormatStyle {
 
     static func dayInterval(range: ClosedRange<Int>) -> DayIntervalParseableFormatStyle {
         .init(range: range)
+    }
+}
+
+struct NilIfEmptyStringFormatStyle: ParseableFormatStyle {
+
+    var parseStrategy: NilIfEmptyStringParseStrategy = .init()
+
+    func format(_ value: String?) -> String {
+        value ?? ""
+    }
+}
+
+struct NilIfEmptyStringParseStrategy: ParseStrategy {
+
+    func parse(_ value: String) -> String? {
+        value.isEmpty ? nil : value
+    }
+}
+
+extension ParseableFormatStyle where Self == NilIfEmptyStringFormatStyle {
+
+    static var nilIfEmptyString: NilIfEmptyStringFormatStyle {
+        .init()
     }
 }
 

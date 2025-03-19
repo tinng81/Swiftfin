@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import CoreStore
@@ -64,13 +64,8 @@ extension UserState {
         }
     }
 
-    var isAdministrator: Bool {
-        data.policy?.isAdministrator ?? false
-    }
-
-    // Validate that the use has permission to delete something whether from a folder or all folders
-    var hasDeletionPermissions: Bool {
-        data.policy?.enableContentDeletion ?? false || data.policy?.enableContentDeletionFromFolders != []
+    var permissions: UserPermissions {
+        UserPermissions(data.policy)
     }
 
     var pinHint: String {
@@ -157,7 +152,6 @@ extension UserState {
         let scaleWidth = maxWidth == nil ? nil : UIScreen.main.scale(maxWidth!)
 
         let parameters = Paths.GetUserImageParameters(
-            tag: data.primaryImageTag,
             maxWidth: scaleWidth
         )
         let request = Paths.getUserImage(

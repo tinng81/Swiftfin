@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
@@ -26,14 +26,7 @@ extension ItemView {
 
                 ScrollView(.horizontal) {
                     HStack(alignment: .top, spacing: 30) {
-                        PosterButton(item: viewModel.item, type: .portrait)
-                            .content {
-                                EmptyView()
-                            }
-                            .imageOverlay {
-                                EmptyView()
-                            }
-                            .frame(height: 405)
+                        ImageCard(viewModel: viewModel)
 
                         OverviewCard(item: viewModel.item)
 

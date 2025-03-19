@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -44,6 +44,8 @@ final class SettingsCoordinator: NavigationCoordinatable {
     @Route(.push)
     var indicatorSettings = makeIndicatorSettings
     @Route(.push)
+    var itemViewAttributes = makeItemViewAttributes
+    @Route(.push)
     var serverConnection = makeServerConnection
     @Route(.push)
     var videoPlayerSettings = makeVideoPlayerSettings
@@ -79,6 +81,8 @@ final class SettingsCoordinator: NavigationCoordinatable {
     var videoPlayerSettings = makeVideoPlayerSettings
     @Route(.modal)
     var playbackQualitySettings = makePlaybackQualitySettings
+    @Route(.modal)
+    var userProfile = makeUserProfileSettings
     #endif
 
     #if os(iOS)
@@ -123,8 +127,8 @@ final class SettingsCoordinator: NavigationCoordinatable {
         UserLocalSecurityView()
     }
 
-    func makePhotoPicker(viewModel: SettingsViewModel) -> NavigationViewCoordinator<UserProfileImageCoordinator> {
-        NavigationViewCoordinator(UserProfileImageCoordinator())
+    func makePhotoPicker(viewModel: UserProfileImageViewModel) -> NavigationViewCoordinator<UserProfileImageCoordinator> {
+        NavigationViewCoordinator(UserProfileImageCoordinator(viewModel: viewModel))
     }
 
     @ViewBuilder
@@ -145,6 +149,12 @@ final class SettingsCoordinator: NavigationCoordinatable {
     @ViewBuilder
     func makeIndicatorSettings() -> some View {
         IndicatorSettingsView()
+    }
+
+    @ViewBuilder
+    func makeItemViewAttributes(selection: Binding<[ItemViewAttribute]>) -> some View {
+        OrderedSectionSelectorView(selection: selection, sources: ItemViewAttribute.allCases)
+            .navigationTitle(L10n.mediaAttributes.localizedCapitalized)
     }
 
     @ViewBuilder
@@ -181,13 +191,24 @@ final class SettingsCoordinator: NavigationCoordinatable {
     #endif
 
     #if os(tvOS)
-    func makeCustomizeViewsSettings() -> NavigationViewCoordinator<BasicNavigationViewCoordinator> {
+
+    // MARK: - User Profile View
+
+    func makeUserProfileSettings(viewModel: SettingsViewModel) -> NavigationViewCoordinator<UserProfileSettingsCoordinator> {
         NavigationViewCoordinator(
-            BasicNavigationViewCoordinator {
-                CustomizeViewsSettings()
-            }
+            UserProfileSettingsCoordinator(viewModel: viewModel)
         )
     }
+
+    // MARK: - Customize Settings View
+
+    func makeCustomizeViewsSettings() -> NavigationViewCoordinator<CustomizeSettingsCoordinator> {
+        NavigationViewCoordinator(
+            CustomizeSettingsCoordinator()
+        )
+    }
+
+    // MARK: - Experimental Settings View
 
     func makeExperimentalSettings() -> NavigationViewCoordinator<BasicNavigationViewCoordinator> {
         NavigationViewCoordinator(
@@ -197,11 +218,15 @@ final class SettingsCoordinator: NavigationCoordinatable {
         )
     }
 
+    // MARK: - Poster Indicator Settings View
+
     func makeIndicatorSettings() -> NavigationViewCoordinator<BasicNavigationViewCoordinator> {
         NavigationViewCoordinator {
             IndicatorSettingsView()
         }
     }
+
+    // MARK: - Server Settings View
 
     func makeServerDetail(server: ServerState) -> NavigationViewCoordinator<BasicNavigationViewCoordinator> {
         NavigationViewCoordinator {
@@ -209,11 +234,15 @@ final class SettingsCoordinator: NavigationCoordinatable {
         }
     }
 
+    // MARK: - Video Player Settings View
+
     func makeVideoPlayerSettings() -> NavigationViewCoordinator<VideoPlayerSettingsCoordinator> {
         NavigationViewCoordinator(
             VideoPlayerSettingsCoordinator()
         )
     }
+
+    // MARK: - Playback Settings View
 
     func makePlaybackQualitySettings() -> NavigationViewCoordinator<PlaybackQualitySettingsCoordinator> {
         NavigationViewCoordinator(

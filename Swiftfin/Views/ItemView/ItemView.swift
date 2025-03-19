@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -32,16 +32,31 @@ struct ItemView: View {
 
     @StoredValue(.User.enableItemDeletion)
     private var enableItemDeletion: Bool
-    @StoredValue(.User.enableItemEditor)
-    private var enableItemEditor: Bool
+    @StoredValue(.User.enableItemEditing)
+    private var enableItemEditing: Bool
+    @StoredValue(.User.enableCollectionManagement)
+    private var enableCollectionManagement: Bool
 
     private var canDelete: Bool {
-        enableItemDeletion && viewModel.item.canDelete ?? false
+        if viewModel.item.type == .boxSet {
+            return enableCollectionManagement && viewModel.item.canDelete ?? false
+        } else {
+            return enableItemDeletion && viewModel.item.canDelete ?? false
+        }
     }
 
-    // As more menu items exist, this can either be expanded to include more validation or removed if there are permanent menu items.
+    private var canEdit: Bool {
+        if viewModel.item.type == .boxSet {
+            return enableCollectionManagement
+        } else {
+            return enableItemEditing
+        }
+    }
+
+    // Use to hide the menu button when not needed.
+    // Add more checks as needed. For example, canDownload.
     private var enableMenu: Bool {
-        canDelete || enableItemEditor
+        canDelete || canEdit
     }
 
     private static func typeViewModel(for item: BaseItemDto) -> ItemViewModel {
@@ -107,7 +122,7 @@ struct ItemView: View {
     }
 
     var body: some View {
-        WrappedView {
+        ZStack {
             switch viewModel.state {
             case .content:
                 contentView
@@ -123,12 +138,21 @@ struct ItemView: View {
         .onFirstAppear {
             viewModel.send(.refresh)
         }
-        .topBarTrailing {
-            if viewModel.backgroundStates.contains(.refresh) {
-                ProgressView()
+        .navigationBarMenuButton(
+            isLoading: viewModel.backgroundStates.contains(.refresh),
+            isHidden: !enableMenu
+        ) {
+            if canEdit {
+                Button(L10n.edit, systemImage: "pencil") {
+                    router.route(to: \.itemEditor, viewModel)
+                }
             }
-            if enableMenu {
-                itemActionMenu
+
+            if canDelete {
+                Divider()
+                Button(L10n.delete, systemImage: "trash", role: .destructive) {
+                    showConfirmationDialog = true
+                }
             }
         }
         .confirmationDialog(
@@ -158,28 +182,5 @@ struct ItemView: View {
         } message: { error in
             Text(error.localizedDescription)
         }
-    }
-
-    @ViewBuilder
-    private var itemActionMenu: some View {
-
-        Menu(L10n.options, systemImage: "ellipsis.circle") {
-
-            if enableItemEditor {
-                Button(L10n.edit, systemImage: "pencil") {
-                    router.route(to: \.itemEditor, viewModel.item)
-                }
-            }
-
-            if canDelete {
-                Divider()
-                Button(L10n.delete, systemImage: "trash", role: .destructive) {
-                    showConfirmationDialog = true
-                }
-            }
-        }
-        .labelStyle(.iconOnly)
-        .backport
-        .fontWeight(.semibold)
     }
 }

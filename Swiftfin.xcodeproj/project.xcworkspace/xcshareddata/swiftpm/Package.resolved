@@ -1,5 +1,5 @@
 {
-  "originHash" : "651194fc1966b57201a0de2cba27dc40798bbdf515febdc83f00d634d916fea4",
+  "originHash" : "66bff9f26defe8d2dfa92b4e65d0ae348e3b586d0fbb7de49c9c937459e6b55c",
   "pins" : [
     {
       "identity" : "blurhashkit",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/LePips/CollectionHStack",
       "state" : {
         "branch" : "main",
-        "revision" : "894b595185bbfce007d60b219ee3e4013884131c"
+        "revision" : "00beb78cc570ee1014a92eb1cd7a60c099bce5ec"
       }
     },
     {
@@ -34,7 +34,7 @@
       "location" : "https://github.com/LePips/CollectionVGrid",
       "state" : {
         "branch" : "main",
-        "revision" : "91ba930a502761924204ae74a59ded05f3b7ef89"
+        "revision" : "4b1591321339481756af6157c9205051d7fe3040"
       }
     },
     {
@@ -182,6 +182,15 @@
       }
     },
     {
+      "identity" : "swift-identified-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-identified-collections",
+      "state" : {
+        "revision" : "2f5ab6e091dd032b63dacbda052405756010dc3b",
+        "version" : "1.1.0"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
@@ -218,6 +227,15 @@
       }
     },
     {
+      "identity" : "tvospicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ViacomInc/TVOSPicker",
+      "state" : {
+        "revision" : "90806460f3b3e7564344647241c157aeb0b27a71",
+        "version" : "0.3.0"
+      }
+    },
+    {
       "identity" : "udpbroadcastconnection",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gunterhager/UDPBroadcastConnection",
@@ -242,6 +260,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "50d4f6ec05a2d8333952def0d8e45019a4207132"
+      }
+    },
+    {
+      "identity" : "wrappinghstack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dkk/WrappingHStack",
+      "state" : {
+        "revision" : "425d9488ba55f58f0b34498c64c054c77fc2a44b",
+        "version" : "2.2.11"
       }
     }
   ],

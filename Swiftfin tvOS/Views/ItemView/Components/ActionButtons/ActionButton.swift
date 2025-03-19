@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -13,14 +13,24 @@ extension ItemView {
 
     struct ActionButton: View {
 
+        // MARK: - Environment Objects
+
         @Environment(\.isSelected)
         private var isSelected
+
+        // MARK: - Focus State
+
         @FocusState
         private var isFocused: Bool
+
+        // MARK: - Item Variables
 
         let title: String
         let icon: String
         let selectedIcon: String
+
+        // MARK: - Item Actions
+
         let onSelect: () -> Void
 
         // MARK: - Body
@@ -46,6 +56,7 @@ extension ItemView {
                         .labelStyle(.iconOnly)
                 }
             }
+            .padding(0)
             .focused($isFocused)
             .buttonStyle(.card)
         }

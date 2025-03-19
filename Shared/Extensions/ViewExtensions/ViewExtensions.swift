@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -148,6 +148,15 @@ extension View {
         modifier(BottomEdgeGradientModifier(bottomColor: bottomColor))
     }
 
+    /// Error Message Alert
+    func errorMessage(
+        _ error: Binding<Error?>,
+        dismissActions: (() -> Void)? = nil
+    ) -> some View {
+        modifier(ErrorMessageModifier(error: error, dismissActions: dismissActions))
+    }
+
+    /// Apply a corner radius as a ratio of a view's side
     func posterShadow() -> some View {
         shadow(radius: 4, y: 2)
     }
@@ -257,12 +266,7 @@ extension View {
         }
     }
 
-    func asAttributeStyle(_ style: AttributeViewModifier.Style) -> some View {
-        modifier(AttributeViewModifier(style: style))
-    }
-
-    // TODO: rename `blurredFullScreenCover`
-    func blurFullScreenCover(
+    func blurredFullScreenCover(
         isPresented: Binding<Bool>,
         onDismiss: (() -> Void)? = nil,
         @ViewBuilder content: @escaping () -> any View
@@ -314,19 +318,10 @@ extension View {
         }
     }
 
-    func onNotification(_ name: NSNotification.Name, perform action: @escaping (Notification) -> Void) -> some View {
+    func onNotification<P>(_ key: Notifications.Key<P>, perform action: @escaping (P) -> Void) -> some View {
         modifier(
             OnReceiveNotificationModifier(
-                notification: name,
-                onReceive: action
-            )
-        )
-    }
-
-    func onNotification(_ swiftfinNotification: Notifications.Key, perform action: @escaping (Notification) -> Void) -> some View {
-        modifier(
-            OnReceiveNotificationModifier(
-                notification: swiftfinNotification.underlyingNotification.name,
+                key: key,
                 onReceive: action
             )
         )

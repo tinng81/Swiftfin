@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -24,24 +24,24 @@ final class DevicesViewModel: ViewModel, Eventful, Stateful {
     // MARK: - Action
 
     enum Action: Equatable {
-        case getDevices
-        case deleteDevices(ids: [String])
+        case refresh
+        case delete(ids: [String])
     }
 
     // MARK: - BackgroundState
 
     enum BackgroundState: Hashable {
-        case gettingDevices
-        case settingCustomName
-        case deletingDevices
+        case refreshing
+        case updating
+        case deleting
     }
 
     // MARK: - State
 
     enum State: Hashable {
+        case initial
         case content
         case error(JellyfinAPIError)
-        case initial
     }
 
     // MARK: Published Values
@@ -66,10 +66,10 @@ final class DevicesViewModel: ViewModel, Eventful, Stateful {
 
     func respond(to action: Action) -> State {
         switch action {
-        case .getDevices:
+        case .refresh:
             deviceTask?.cancel()
 
-            backgroundStates.append(.gettingDevices)
+            backgroundStates.append(.refreshing)
 
             deviceTask = Task { [weak self] in
                 do {
@@ -89,16 +89,16 @@ final class DevicesViewModel: ViewModel, Eventful, Stateful {
                 }
 
                 await MainActor.run {
-                    _ = self?.backgroundStates.remove(.gettingDevices)
+                    _ = self?.backgroundStates.remove(.refreshing)
                 }
             }
             .asAnyCancellable()
 
             return state
-        case let .deleteDevices(ids):
+        case let .delete(ids):
             deviceTask?.cancel()
 
-            backgroundStates.append(.deletingDevices)
+            backgroundStates.append(.deleting)
 
             deviceTask = Task { [weak self] in
                 do {
@@ -116,7 +116,7 @@ final class DevicesViewModel: ViewModel, Eventful, Stateful {
                 }
 
                 await MainActor.run {
-                    _ = self?.backgroundStates.remove(.deletingDevices)
+                    _ = self?.backgroundStates.remove(.deleting)
                 }
             }
             .asAnyCancellable()

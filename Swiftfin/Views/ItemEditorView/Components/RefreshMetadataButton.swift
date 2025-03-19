@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -13,6 +13,8 @@ extension ItemEditorView {
 
     struct RefreshMetadataButton: View {
 
+        // MARK: - Environment & State Objects
+
         // Bug in SwiftUI where Menu item icons will be black in dark mode
         // when a HierarchicalShapeStyle is applied to the Buttons
         @Environment(\.colorScheme)
@@ -21,10 +23,10 @@ extension ItemEditorView {
         @StateObject
         private var viewModel: RefreshMetadataViewModel
 
+        // MARK: - Error State
+
         @State
-        private var isPresentingEventAlert = false
-        @State
-        private var error: JellyfinAPIError?
+        private var error: Error?
 
         // MARK: - Initializer
 
@@ -103,25 +105,14 @@ extension ItemEditorView {
                 }
             }
             .foregroundStyle(.primary, .secondary)
-            .disabled(viewModel.state == .refreshing || isPresentingEventAlert)
+            .disabled(viewModel.state == .refreshing || error != nil)
             .onReceive(viewModel.events) { event in
                 switch event {
                 case let .error(eventError):
                     error = eventError
-                    isPresentingEventAlert = true
-                case .refreshTriggered:
-                    UIDevice.impact(.light)
                 }
             }
-            .alert(
-                L10n.error,
-                isPresented: $isPresentingEventAlert,
-                presenting: error
-            ) { _ in
-
-            } message: { error in
-                Text(error.localizedDescription)
-            }
+            .errorMessage($error)
         }
     }
 }

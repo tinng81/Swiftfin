@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -39,11 +39,8 @@ struct PlaybackQualitySettingsView: View {
             }
             .contentView {
                 Section {
-                    InlineEnumToggle(
-                        title: L10n.maximumBitrate,
-                        selection: $appMaximumBitrate
-                    )
-                    .focused($focusedItem, equals: .maximumBitrate)
+                    ListRowMenu(L10n.maximumBitrate, selection: $appMaximumBitrate)
+                        .focused($focusedItem, equals: .maximumBitrate)
                 } header: {
                     L10n.bitrateDefault.text
                 } footer: {
@@ -53,21 +50,15 @@ struct PlaybackQualitySettingsView: View {
 
                 if appMaximumBitrate == .auto {
                     Section {
-                        InlineEnumToggle(
-                            title: L10n.testSize,
-                            selection: $appMaximumBitrateTest
-                        )
+                        ListRowMenu(L10n.testSize, selection: $appMaximumBitrateTest)
                     } footer: {
                         L10n.bitrateTestDisclaimer.text
                     }
                 }
 
                 Section {
-                    InlineEnumToggle(
-                        title: L10n.compatibility,
-                        selection: $compatibilityMode
-                    )
-                    .focused($focusedItem, equals: .compatibility)
+                    ListRowMenu(L10n.compatibility, selection: $compatibilityMode)
+                        .focused($focusedItem, equals: .compatibility)
 
                     if compatibilityMode == .custom {
                         ChevronButton(L10n.profiles)

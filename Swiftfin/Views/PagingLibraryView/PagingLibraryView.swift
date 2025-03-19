@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2024 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
 //
 
 import CollectionVGrid
@@ -71,7 +71,7 @@ struct PagingLibraryView<Element: Poster>: View {
     private var posterType: PosterDisplayType
 
     @StateObject
-    private var collectionVGridProxy: CollectionVGridProxy<Element> = .init()
+    private var collectionVGridProxy: CollectionVGridProxy = .init()
     @StateObject
     private var viewModel: PagingLibraryViewModel<Element>
 
@@ -239,8 +239,9 @@ struct PagingLibraryView<Element: Poster>: View {
     @ViewBuilder
     private var gridView: some View {
         CollectionVGrid(
-            $viewModel.elements,
-            layout: $layout
+            uniqueElements: viewModel.elements,
+            id: \.unwrappedIDHashOrZero,
+            layout: layout
         ) { item in
 
             let displayType = Defaults[.Customization.Library.rememberLayout] ? _displayType.wrappedValue : _defaultDisplayType
@@ -471,35 +472,27 @@ struct PagingLibraryView<Element: Poster>: View {
                 viewModel.send(.refresh)
             }
         }
-        .topBarTrailing {
-
-            if viewModel.backgroundStates.contains(.gettingNextPage) {
-                ProgressView()
+        .navigationBarMenuButton(
+            isLoading: viewModel.backgroundStates.contains(.gettingNextPage)
+        ) {
+            if Defaults[.Customization.Library.rememberLayout] {
+                LibraryViewTypeToggle(
+                    posterType: $posterType,
+                    viewType: $displayType,
+                    listColumnCount: $listColumnCount
+                )
+            } else {
+                LibraryViewTypeToggle(
+                    posterType: $defaultPosterType,
+                    viewType: $defaultDisplayType,
+                    listColumnCount: $defaultListColumnCount
+                )
             }
 
-            Menu {
-
-                if Defaults[.Customization.Library.rememberLayout] {
-                    LibraryViewTypeToggle(
-                        posterType: $posterType,
-                        viewType: $displayType,
-                        listColumnCount: $listColumnCount
-                    )
-                } else {
-                    LibraryViewTypeToggle(
-                        posterType: $defaultPosterType,
-                        viewType: $defaultDisplayType,
-                        listColumnCount: $defaultListColumnCount
-                    )
-                }
-
-                Button(L10n.random, systemImage: "dice.fill") {
-                    viewModel.send(.getRandomItem)
-                }
-                .disabled(viewModel.elements.isEmpty)
-            } label: {
-                Image(systemName: "ellipsis.circle")
+            Button(L10n.random, systemImage: "dice.fill") {
+                viewModel.send(.getRandomItem)
             }
+            .disabled(viewModel.elements.isEmpty)
         }
     }
 }
